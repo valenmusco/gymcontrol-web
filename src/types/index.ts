@@ -75,7 +75,7 @@ export interface Auditoria {
 export interface SessionPayload {
   adminId: string
   email: string
-  gimnaioId: string
+  gimnasioId: string
   nombre: string
   iat?: number
   exp?: number

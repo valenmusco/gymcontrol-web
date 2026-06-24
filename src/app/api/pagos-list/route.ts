@@ -9,7 +9,7 @@ export async function GET() {
   const { data, error } = await supabaseAdmin
     .from('pagos')
     .select('*, socios(nombre, apellido, telefono)')
-    .eq('gimnasio_id', session.gimnaioId)
+    .eq('gimnasio_id', session.gimnasioId)
     .order('fecha_vencimiento', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

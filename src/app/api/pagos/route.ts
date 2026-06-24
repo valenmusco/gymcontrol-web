@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabaseAdmin
     .from('pagos')
     .insert({
-      gimnasio_id: session.gimnaioId,
+      gimnasio_id: session.gimnasioId,
       socio_id,
       monto: Number(monto),
       mes_cobrado: mes_cobrado || null,
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await registrarAuditoria({
-    gimnasio_id: session.gimnaioId,
+    gimnasio_id: session.gimnasioId,
     admin_id: session.adminId,
     accion: 'PAGO_CREADO',
     tabla: 'pagos',

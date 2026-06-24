@@ -7,7 +7,7 @@ import StatCard from '@/components/StatCard'
 import InformesCharts from '@/components/InformesCharts'
 import { IngresosMes } from '@/types'
 
-async function getInformesData(gimnaioId: string) {
+async function getInformesData(gimnasioId: string) {
   const ahora = new Date()
   const hace6Meses = format(startOfMonth(subMonths(ahora, 5)), 'yyyy-MM-dd')
 
@@ -15,11 +15,11 @@ async function getInformesData(gimnaioId: string) {
     supabaseAdmin
       .from('pagos')
       .select('monto, fecha_pago, estado, fecha_vencimiento')
-      .eq('gimnasio_id', gimnaioId),
+      .eq('gimnasio_id', gimnasioId),
     supabaseAdmin
       .from('socios')
       .select('id, estado')
-      .eq('gimnasio_id', gimnaioId),
+      .eq('gimnasio_id', gimnasioId),
   ])
 
   const pagos = pagosRes.data || []
@@ -91,7 +91,7 @@ export default async function InformesPage() {
     ingresosMesActual,
     totalIngresos,
     totalSocios,
-  } = await getInformesData(session.gimnaioId)
+  } = await getInformesData(session.gimnasioId)
 
   return (
     <div className="p-8">

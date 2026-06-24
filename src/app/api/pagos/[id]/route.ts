@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     .from('pagos')
     .select('*')
     .eq('id', id)
-    .eq('gimnasio_id', session.gimnaioId)
+    .eq('gimnasio_id', session.gimnasioId)
     .single()
 
   if (!anterior) return NextResponse.json({ error: 'Pago no encontrado' }, { status: 404 })
@@ -33,14 +33,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       notas: notas || null,
     })
     .eq('id', id)
-    .eq('gimnasio_id', session.gimnaioId)
+    .eq('gimnasio_id', session.gimnasioId)
     .select()
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await registrarAuditoria({
-    gimnasio_id: session.gimnaioId,
+    gimnasio_id: session.gimnasioId,
     admin_id: session.adminId,
     accion: 'PAGO_EDITADO',
     tabla: 'pagos',
