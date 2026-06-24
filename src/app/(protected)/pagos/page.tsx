@@ -11,7 +11,7 @@ async function getData(gimnaioId: string) {
       .order('fecha_vencimiento', { ascending: false }),
     supabaseAdmin
       .from('socios')
-      .select('id, nombre, apellido')
+      .select('id, nombre, apellido, gimnasio_id, estado')
       .eq('gimnasio_id', gimnaioId)
       .eq('estado', 'activo')
       .order('nombre'),
