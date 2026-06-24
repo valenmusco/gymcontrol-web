@@ -1,5 +1,6 @@
 import { getSession } from '@/lib/session'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { Socio } from '@/types'
 import PagosClient from './PagosClient'
 
 async function getData(gimnaioId: string) {
@@ -11,7 +12,7 @@ async function getData(gimnaioId: string) {
       .order('fecha_vencimiento', { ascending: false }),
     supabaseAdmin
       .from('socios')
-      .select('id, nombre, apellido, gimnasio_id, estado')
+      .select('id, nombre, apellido, gimnasio_id, estado, telefonos_whatsapp, fecha_inicio')
       .eq('gimnasio_id', gimnaioId)
       .eq('estado', 'activo')
       .order('nombre'),
@@ -19,7 +20,7 @@ async function getData(gimnaioId: string) {
 
   return {
     pagos: pagosRes.data || [],
-    socios: sociosRes.data || [],
+    socios: (sociosRes.data || []) as Socio[],
   }
 }
 
