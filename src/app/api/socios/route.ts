@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabaseAdmin
     .from('socios')
-    .select('*, planes(nombre, precio)')
+    .select('*, planes(nombre, precio_mensual)')
     .eq('gimnasio_id', session.gimnaioId)
     .order('created_at', { ascending: false })
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       nombre,
       apellido: apellido || null,
       email: email || null,
-      telefono: telefono || null,
+      telefonos_whatsapp: telefono || null,
       plan_id: plan_id || null,
       estado: estado || 'activo',
       fecha_inicio: fecha_inicio || new Date().toISOString().split('T')[0],

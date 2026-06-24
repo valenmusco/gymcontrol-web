@@ -6,14 +6,14 @@ async function getData(gimnaioId: string) {
   const [sociosRes, planesRes] = await Promise.all([
     supabaseAdmin
       .from('socios')
-      .select('*, planes(nombre, precio)')
+      .select('*, planes(nombre, precio_mensual)')
       .eq('gimnasio_id', gimnaioId)
       .order('created_at', { ascending: false }),
     supabaseAdmin
       .from('planes')
       .select('*')
       .eq('gimnasio_id', gimnaioId)
-      .eq('activo', true),
+      .eq('estado', 'activo'),
   ])
 
   return {

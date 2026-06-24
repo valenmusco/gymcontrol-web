@@ -23,7 +23,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const { data, error } = await supabaseAdmin
     .from('socios')
-    .update({ nombre, apellido, email, telefono, plan_id, estado, fecha_inicio })
+    .update({ nombre, apellido, email, telefonos_whatsapp: telefono, plan_id, estado, fecha_inicio })
     .eq('id', id)
     .eq('gimnasio_id', session.gimnaioId)
     .select()

@@ -33,7 +33,7 @@ export default function SociosClient({ sociosIniciales, planes }: SociosClientPr
     return socios.filter(s =>
       s.nombre?.toLowerCase().includes(q) ||
       s.apellido?.toLowerCase().includes(q) ||
-      s.telefono?.includes(q)
+      s.telefonos_whatsapp?.includes(q)
     )
   }, [socios, busqueda])
 
@@ -128,7 +128,7 @@ export default function SociosClient({ sociosIniciales, planes }: SociosClientPr
                     <td className="px-4 py-3 font-medium text-gray-900">
                       {socio.nombre} {socio.apellido || ''}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{socio.telefono || '—'}</td>
+                    <td className="px-4 py-3 text-gray-600">{socio.telefonos_whatsapp || '—'}</td>
                     <td className="px-4 py-3 text-gray-600">
                       {(socio.planes as Plan | undefined)?.nombre || '—'}
                     </td>

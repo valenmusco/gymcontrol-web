@@ -24,9 +24,9 @@ export interface Plan {
   gimnasio_id: string
   nombre: string
   descripcion?: string
-  precio: number
+  precio_mensual: number
   duracion_dias?: number
-  activo?: boolean
+  estado?: string
 }
 
 export interface Socio {
@@ -35,7 +35,7 @@ export interface Socio {
   nombre: string
   apellido?: string
   email?: string
-  telefono?: string
+  telefonos_whatsapp?: string
   plan_id?: string
   estado: 'activo' | 'inactivo' | 'suspendido'
   fecha_inicio?: string
@@ -49,6 +49,7 @@ export interface Pago {
   socio_id: string
   gimnasio_id: string
   monto: number
+  mes_cobrado?: string
   fecha_vencimiento: string
   fecha_pago?: string | null
   estado: 'pendiente' | 'pagado' | 'vencido'

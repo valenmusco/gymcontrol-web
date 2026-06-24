@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { CreditCard, Eye, CheckCircle, Filter } from 'lucide-react'
+import { CreditCard, Eye, CheckCircle, Filter, Plus, Pencil } from 'lucide-react'
 import { Pago, Socio } from '@/types'
 import PagoDetalleModal from '@/components/PagoDetalleModal'
+import PagoModal from '@/components/PagoModal'
 
 interface PagosClientProps {
   pagosIniciales: Pago[]
+  socios: Socio[]
 }
 
 const estadoOpciones = [
@@ -35,23 +37,24 @@ function getMeses() {
   return meses
 }
 
-export default function PagosClient({ pagosIniciales }: PagosClientProps) {
+export default function PagosClient({ pagosIniciales, socios }: PagosClientProps) {
   const [pagos, setPagos] = useState<Pago[]>(pagosIniciales)
   const [estadoFiltro, setEstadoFiltro] = useState('')
   const [mesFiltro, setMesFiltro] = useState('')
   const [busqueda, setBusqueda] = useState('')
-  const [pagoSeleccionado, setPagoSeleccionado] = useState<Pago | null>(null)
+  const [pagoDetalle, setPagoDetalle] = useState<Pago | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [pagoEditar, setPagoEditar] = useState<Pago | null>(null)
+  const [marcandoId, setMarcandoId] = useState<string | null>(null)
   const meses = getMeses()
 
   const pagosFiltrados = useMemo(() => {
     return pagos.filter(p => {
       const socio = p.socios as Socio | undefined
       const nombreSocio = `${socio?.nombre || ''} ${socio?.apellido || ''}`.toLowerCase()
-
       if (estadoFiltro && p.estado !== estadoFiltro) return false
       if (mesFiltro && !p.fecha_vencimiento?.startsWith(mesFiltro)) return false
       if (busqueda && !nombreSocio.includes(busqueda.toLowerCase())) return false
-
       return true
     })
   }, [pagos, estadoFiltro, mesFiltro, busqueda])
@@ -62,9 +65,32 @@ export default function PagosClient({ pagosIniciales }: PagosClientProps) {
       const data = await res.json()
       if (data.data) setPagos(data.data)
     } else {
-      // Recargar la página como fallback
       window.location.reload()
     }
+  }
+
+  async function marcarPagado(pago: Pago) {
+    setMarcandoId(pago.id)
+    try {
+      const res = await fetch(`/api/pagos/${pago.id}/pagar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fecha_pago: new Date().toISOString().split('T')[0], metodo_pago: 'efectivo' }),
+      })
+      if (res.ok) await recargarPagos()
+    } finally {
+      setMarcandoId(null)
+    }
+  }
+
+  function abrirEditar(pago: Pago) {
+    setPagoEditar(pago)
+    setModalOpen(true)
+  }
+
+  function abrirNuevo() {
+    setPagoEditar(null)
+    setModalOpen(true)
   }
 
   const totalesPorEstado = useMemo(() => ({
@@ -75,15 +101,24 @@ export default function PagosClient({ pagosIniciales }: PagosClientProps) {
 
   return (
     <div className="p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <CreditCard className="w-7 h-7" /> Pagos
-        </h1>
-        <div className="flex gap-4 mt-2">
-          <span className="text-sm text-yellow-600 font-medium">{totalesPorEstado.pendiente} pendientes</span>
-          <span className="text-sm text-green-600 font-medium">{totalesPorEstado.pagado} pagados</span>
-          <span className="text-sm text-red-600 font-medium">{totalesPorEstado.vencido} vencidos</span>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <CreditCard className="w-7 h-7" /> Pagos
+          </h1>
+          <div className="flex gap-4 mt-2">
+            <span className="text-sm text-yellow-600 font-medium">{totalesPorEstado.pendiente} pendientes</span>
+            <span className="text-sm text-green-600 font-medium">{totalesPorEstado.pagado} pagados</span>
+            <span className="text-sm text-red-600 font-medium">{totalesPorEstado.vencido} vencidos</span>
+          </div>
         </div>
+        <button
+          onClick={abrirNuevo}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Agregar Pago
+        </button>
       </div>
 
       {/* Filtros */}
@@ -162,19 +197,30 @@ export default function PagosClient({ pagosIniciales }: PagosClientProps) {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <button
-                            onClick={() => setPagoSeleccionado(pago)}
+                            onClick={() => setPagoDetalle(pago)}
                             className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Ver detalle"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
+                          <button
+                            onClick={() => abrirEditar(pago)}
+                            className="p-1.5 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
+                            title="Editar pago"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
                           {pago.estado !== 'pagado' && (
                             <button
-                              onClick={() => setPagoSeleccionado(pago)}
-                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                              onClick={() => marcarPagado(pago)}
+                              disabled={marcandoId === pago.id}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
                               title="Marcar como pagado"
                             >
-                              <CheckCircle className="w-4 h-4" />
+                              {marcandoId === pago.id
+                                ? <div className="w-4 h-4 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
+                                : <CheckCircle className="w-4 h-4" />
+                              }
                             </button>
                           )}
                         </div>
@@ -188,11 +234,18 @@ export default function PagosClient({ pagosIniciales }: PagosClientProps) {
         )}
       </div>
 
-      {/* Modal detalle/pago */}
       <PagoDetalleModal
-        pago={pagoSeleccionado}
-        onClose={() => setPagoSeleccionado(null)}
+        pago={pagoDetalle}
+        onClose={() => setPagoDetalle(null)}
         onPagado={recargarPagos}
+      />
+
+      <PagoModal
+        open={modalOpen}
+        pago={pagoEditar}
+        socios={socios}
+        onClose={() => setModalOpen(false)}
+        onSave={recargarPagos}
       />
     </div>
   )
