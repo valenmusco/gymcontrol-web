@@ -20,7 +20,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error || !admin) {
-      return NextResponse.json({ error: 'Credenciales incorrectas' }, { status: 401 })
+      return NextResponse.json({
+        error: 'Credenciales incorrectas',
+        _debug: error?.message ?? 'admin no encontrado',
+        _url: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        _key: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      }, { status: 401 })
     }
 
     const adminData = admin as Admin
