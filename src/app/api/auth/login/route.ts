@@ -49,13 +49,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Obtener gimnasio_id (soporte para distintos nombres de columna)
-    const gimnasioId = adminData.gimnasio_id
+    const gimnaioId = adminData.gimnasio_id
 
     // Crear sesión JWT
     const token = await createSession({
       adminId: adminData.id,
       email: adminData.email,
-      gimnasioId: gimnasioId,
+      gimnaioId: gimnaioId,
       nombre: adminData.nombre,
     })
 

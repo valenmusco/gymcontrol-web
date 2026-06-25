@@ -37,7 +37,7 @@ export default function SocioModal({ open, socio, planes, onClose, onSave }: Soc
         nombre: socio.nombre || '',
         apellido: socio.apellido || '',
         email: socio.email || '',
-        telefono: socio.telefonos_whatsapp || '',
+        telefono: socio.telefono || '',
         plan_id: socio.plan_id || '',
         estado: socio.estado || 'activo',
         fecha_inicio: socio.fecha_inicio || new Date().toISOString().split('T')[0],
@@ -156,7 +156,7 @@ export default function SocioModal({ open, socio, planes, onClose, onSave }: Soc
                 <option value="">Sin plan</option>
                 {planes.map(p => (
                   <option key={p.id} value={p.id}>
-                    {p.nombre} — ${p.precio_mensual}
+                    {p.nombre} — ${p.precio}
                   </option>
                 ))}
               </select>

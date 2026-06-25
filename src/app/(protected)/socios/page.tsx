@@ -2,18 +2,18 @@ import { getSession } from '@/lib/session'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import SociosClient from './SociosClient'
 
-async function getData(gimnasioId: string) {
+async function getData(gimnaioId: string) {
   const [sociosRes, planesRes] = await Promise.all([
     supabaseAdmin
       .from('socios')
-      .select('*, planes(nombre, precio_mensual)')
-      .eq('gimnasio_id', gimnasioId)
+      .select('*, planes(nombre, precio)')
+      .eq('gimnasio_id', gimnaioId)
       .order('created_at', { ascending: false }),
     supabaseAdmin
       .from('planes')
       .select('*')
-      .eq('gimnasio_id', gimnasioId)
-      .eq('estado', 'activo'),
+      .eq('gimnasio_id', gimnaioId)
+      .eq('activo', true),
   ])
 
   return {
@@ -26,7 +26,7 @@ export default async function SociosPage() {
   const session = await getSession()
   if (!session) return null
 
-  const { socios, planes } = await getData(session.gimnasioId)
+  const { socios, planes } = await getData(session.gimnaioId)
 
   return <SociosClient sociosIniciales={socios} planes={planes} />
 }

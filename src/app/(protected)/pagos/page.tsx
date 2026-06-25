@@ -1,34 +1,22 @@
 import { getSession } from '@/lib/session'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import { Socio } from '@/types'
 import PagosClient from './PagosClient'
 
-async function getData(gimnasioId: string) {
-  const [pagosRes, sociosRes] = await Promise.all([
-    supabaseAdmin
-      .from('pagos')
-      .select('*, socios(nombre, apellido)')
-      .eq('gimnasio_id', gimnasioId)
-      .order('fecha_vencimiento', { ascending: false }),
-    supabaseAdmin
-      .from('socios')
-      .select('id, nombre, apellido, gimnasio_id, estado, telefonos_whatsapp, fecha_inicio')
-      .eq('gimnasio_id', gimnasioId)
-      .eq('estado', 'activo')
-      .order('nombre'),
-  ])
+async function getPagos(gimnaioId: string) {
+  const { data } = await supabaseAdmin
+    .from('pagos')
+    .select('*, socios(nombre, apellido, telefono)')
+    .eq('gimnasio_id', gimnaioId)
+    .order('fecha_vencimiento', { ascending: false })
 
-  return {
-    pagos: pagosRes.data || [],
-    socios: (sociosRes.data || []) as Socio[],
-  }
+  return data || []
 }
 
 export default async function PagosPage() {
   const session = await getSession()
   if (!session) return null
 
-  const { pagos, socios } = await getData(session.gimnasioId)
+  const pagos = await getPagos(session.gimnaioId)
 
-  return <PagosClient pagosIniciales={pagos} socios={socios} />
+  return <PagosClient pagosIniciales={pagos} />
 }

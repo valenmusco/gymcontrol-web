@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     .from('socios')
     .select('*')
     .eq('id', id)
-    .eq('gimnasio_id', session.gimnasioId)
+    .eq('gimnasio_id', session.gimnaioId)
     .single()
 
   if (!anterior) return NextResponse.json({ error: 'Socio no encontrado' }, { status: 404 })
@@ -23,16 +23,16 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
   const { data, error } = await supabaseAdmin
     .from('socios')
-    .update({ nombre, apellido, email, telefonos_whatsapp: telefono, plan_id, estado, fecha_inicio })
+    .update({ nombre, apellido, email, telefono, plan_id, estado, fecha_inicio })
     .eq('id', id)
-    .eq('gimnasio_id', session.gimnasioId)
+    .eq('gimnasio_id', session.gimnaioId)
     .select()
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await registrarAuditoria({
-    gimnasio_id: session.gimnasioId,
+    gimnasio_id: session.gimnaioId,
     admin_id: session.adminId,
     accion: 'SOCIO_EDITADO',
     tabla: 'socios',
@@ -55,21 +55,21 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     .from('socios')
     .select('estado')
     .eq('id', id)
-    .eq('gimnasio_id', session.gimnasioId)
+    .eq('gimnasio_id', session.gimnaioId)
     .single()
 
   const { data, error } = await supabaseAdmin
     .from('socios')
     .update({ estado })
     .eq('id', id)
-    .eq('gimnasio_id', session.gimnasioId)
+    .eq('gimnasio_id', session.gimnaioId)
     .select()
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await registrarAuditoria({
-    gimnasio_id: session.gimnasioId,
+    gimnasio_id: session.gimnaioId,
     admin_id: session.adminId,
     accion: estado === 'activo' ? 'SOCIO_ACTIVADO' : 'SOCIO_DESACTIVADO',
     tabla: 'socios',

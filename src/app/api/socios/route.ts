@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
 
   let query = supabaseAdmin
     .from('socios')
-    .select('*, planes(nombre, precio_mensual)')
-    .eq('gimnasio_id', session.gimnasioId)
+    .select('*, planes(nombre, precio)')
+    .eq('gimnasio_id', session.gimnaioId)
     .order('created_at', { ascending: false })
 
   if (busqueda) {
@@ -40,11 +40,11 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabaseAdmin
     .from('socios')
     .insert({
-      gimnasio_id: session.gimnasioId,
+      gimnasio_id: session.gimnaioId,
       nombre,
       apellido: apellido || null,
       email: email || null,
-      telefonos_whatsapp: telefono || null,
+      telefono: telefono || null,
       plan_id: plan_id || null,
       estado: estado || 'activo',
       fecha_inicio: fecha_inicio || new Date().toISOString().split('T')[0],
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await registrarAuditoria({
-    gimnasio_id: session.gimnasioId,
+    gimnasio_id: session.gimnaioId,
     admin_id: session.adminId,
     accion: 'SOCIO_CREADO',
     tabla: 'socios',

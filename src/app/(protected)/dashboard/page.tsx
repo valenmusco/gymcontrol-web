@@ -7,29 +7,29 @@ import { IngresosDia } from '@/types'
 import { format, subDays } from 'date-fns'
 import { es } from 'date-fns/locale'
 
-async function getDashboardData(gimnasioId: string) {
+async function getDashboardData(gimnaioId: string) {
   const hoy = new Date()
   const hoyStr = format(hoy, 'yyyy-MM-dd')
   const hace30Dias = format(subDays(hoy, 30), 'yyyy-MM-dd')
 
   const [sociosRes, pagosHoyRes, pagosVencidosRes, ingresosRes] = await Promise.all([
-    supabaseAdmin.from('socios').select('id, estado').eq('gimnasio_id', gimnasioId),
+    supabaseAdmin.from('socios').select('id, estado').eq('gimnasio_id', gimnaioId),
     supabaseAdmin
       .from('pagos')
       .select('monto')
-      .eq('gimnasio_id', gimnasioId)
+      .eq('gimnasio_id', gimnaioId)
       .eq('estado', 'pagado')
       .gte('fecha_pago', hoyStr)
       .lt('fecha_pago', format(subDays(hoy, -1), 'yyyy-MM-dd')),
     supabaseAdmin
       .from('pagos')
       .select('id')
-      .eq('gimnasio_id', gimnasioId)
+      .eq('gimnasio_id', gimnaioId)
       .eq('estado', 'vencido'),
     supabaseAdmin
       .from('pagos')
       .select('monto, fecha_pago')
-      .eq('gimnasio_id', gimnasioId)
+      .eq('gimnasio_id', gimnaioId)
       .eq('estado', 'pagado')
       .gte('fecha_pago', hace30Dias)
       .order('fecha_pago', { ascending: true }),
@@ -75,7 +75,7 @@ export default async function DashboardPage() {
   if (!session) return null
 
   const { totalSocios, sociosActivos, ingresosHoy, pagosVencidos, ingresosMes, chartData } =
-    await getDashboardData(session.gimnasioId)
+    await getDashboardData(session.gimnaioId)
 
   const fechaHoy = format(new Date(), "EEEE d 'de' MMMM", { locale: es })
 
